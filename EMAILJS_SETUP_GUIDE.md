@@ -40,6 +40,7 @@ You have received a new message from your website contact form.
 
 **Name:** {{from_name}}
 **Email:** {{from_email}}
+**Time:** {{timestamp}}
 
 **Message:**
 {{message}}
@@ -69,6 +70,7 @@ emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this)  // Line 548
 ### Template Variable Reference
 - `{{from_name}}` - Visitor's name
 - `{{from_email}}` - Visitor's email address
+- `{{timestamp}}` - Date and time when message was sent
 - `{{message}}` - Visitor's message
 
 ### Testing
