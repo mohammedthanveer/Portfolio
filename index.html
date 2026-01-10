@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
         /* --- 1. VARIABLES & RESET --- */
@@ -450,20 +451,22 @@
             <h2 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 40px; text-align: center;">Contact Me</h2>
             
             <div style="max-width: 600px; margin: 0 auto;">
-                <form action="https://formspree.io/f/xpznqryq" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+                <div id="contact-status" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; font-weight: 600;"></div>
+                
+                <form id="myContactForm" style="display: flex; flex-direction: column; gap: 20px;">
                     <div>
-                        <label for="name" style="display: block; margin-bottom: 5px; color: var(--text-primary); font-weight: 600;">Your Name</label>
-                        <input type="text" id="name" name="name" style="width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem;" placeholder="Enter your name" required>
+                        <label for="visitor_name" style="display: block; margin-bottom: 5px; color: var(--text-primary); font-weight: 600;">Your Name</label>
+                        <input type="text" id="visitor_name" name="visitor_name" style="width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem;" placeholder="Enter your name" required>
                     </div>
                     
                     <div>
-                        <label for="email" style="display: block; margin-bottom: 5px; color: var(--text-primary); font-weight: 600;">Your Email</label>
-                        <input type="email" id="email" name="email" style="width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem;" placeholder="Enter your email" required>
+                        <label for="visitor_email" style="display: block; margin-bottom: 5px; color: var(--text-primary); font-weight: 600;">Your Email</label>
+                        <input type="email" id="visitor_email" name="visitor_email" style="width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem;" placeholder="Enter your email" required>
                     </div>
                     
                     <div>
-                        <label for="message" style="display: block; margin-bottom: 5px; color: var(--text-primary); font-weight: 600;">Your Message</label>
-                        <textarea id="message" name="message" rows="5" style="width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; resize: vertical;" placeholder="Enter your message" required></textarea>
+                        <label for="visitor_message" style="display: block; margin-bottom: 5px; color: var(--text-primary); font-weight: 600;">Your Message</label>
+                        <textarea id="visitor_message" name="visitor_message" rows="5" style="width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; resize: vertical;" placeholder="Enter your message" required></textarea>
                     </div>
                     
                     <button type="submit" style="padding: 12px 30px; background: var(--accent-gradient); color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: var(--transition); align-self: flex-start;">Send Message</button>
@@ -533,25 +536,76 @@
         });
 
         // --- CONTACT FORM HANDLING ---
+        // Initialize EmailJS
+        (function() {
+            emailjs.init('7p4j2hEn_lIb4btXk');
+        })();
+        
+        // Handle form submission
         document.addEventListener('DOMContentLoaded', function() {
-            const contactForm = document.querySelector('#contact-form form');
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    // Don't prevent default - let Formspree handle it
-                    const submitBtn = contactForm.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Sending...';
-                    submitBtn.disabled = true;
-                    
-                    // Formspree will handle the submission and redirect or show success
-                    setTimeout(() => {
-                        if (!contactForm.submitted) {
-                            submitBtn.textContent = originalText;
-                            submitBtn.disabled = false;
-                        }
-                    }, 3000);
-                });
+            console.log('DOM loaded, initializing contact form...');
+            
+            const form = document.getElementById('myContactForm');
+            const statusDiv = document.getElementById('contact-status');
+            
+            if (!form) {
+                console.error('Form myContactForm not found!');
+                return;
             }
+            
+            console.log('Form found, attaching submit listener...');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submitted!');
+                
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+                
+                // Show status message
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(59, 130, 246, 0.2)';
+                statusDiv.style.color = '#60a5fa';
+                statusDiv.textContent = 'Sending your message...';
+                
+                // Get form values
+                const templateParams = {
+                    from_name: document.getElementById('visitor_name').value,
+                    from_email: document.getElementById('visitor_email').value,
+                    message: document.getElementById('visitor_message').value
+                };
+                
+                console.log('Sending email with data:', templateParams);
+                
+                // Send email
+                emailjs.send('service_thanveer', 'template_k856l2v', templateParams)
+                    .then(function(response) {
+                        console.log('SUCCESS:', response);
+                        statusDiv.style.background = 'rgba(34, 197, 94, 0.2)';
+                        statusDiv.style.color = '#4ade80';
+                        statusDiv.textContent = '✓ Message sent successfully! I\'ll get back to you soon.';
+                        
+                        form.reset();
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                        
+                        // Hide status after 5 seconds
+                        setTimeout(() => {
+                            statusDiv.style.display = 'none';
+                        }, 5000);
+                    })
+                    .catch(function(error) {
+                        console.error('ERROR:', error);
+                        statusDiv.style.background = 'rgba(239, 68, 68, 0.2)';
+                        statusDiv.style.color = '#f87171';
+                        statusDiv.textContent = 'Error: ' + (error.text || error.message || 'Failed to send message');
+                        
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    });
+            });
         });
     </script>
 </body>
