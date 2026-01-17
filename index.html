@@ -39,6 +39,7 @@
         .section-padding { padding: 100px 0; }
         .gradient-text {
             background: var(--accent-gradient);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
@@ -72,7 +73,8 @@
             display: flex; justify-content: space-between; align-items: center;
             height: 70px;
         }
-        .logo { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.5rem; }
+        .logo { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.5rem; cursor: pointer; transition: var(--transition); }
+        .logo:hover { color: #3b82f6; }
         .nav-links { display: flex; gap: 30px; }
         .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
         .nav-links a:hover { color: #fff; }
@@ -224,7 +226,7 @@
 
     <nav>
         <div class="container nav-content">
-            <div class="logo">MT<span style="color:#3b82f6">.</span></div>
+            <a href="#hero" class="logo">MT<span style="color:#3b82f6">.</span></a>
             <div class="nav-links">
                 <a href="#skills">Skills</a>
                 <a href="#projects">Projects</a>
